@@ -1,0 +1,20 @@
+cmake_minimum_required(VERSION 3.16)
+
+qt_add_qml_module(AudioModule
+  STATIC
+URI Attorney.Audio
+VERSION 1.0
+SOURCES
+  src/audio.h src/audio.cpp
+  src/audiobackend.h src/audiobackend.cpp
+  src/audiochannel.h src/audiochannel.cpp
+  SOURCES src/audioerror.h
+)
+
+target_include_directories(AudioModule PUBLIC src libs)
+target_link_directories(AudioModule PUBLIC libs)
+target_link_libraries(AudioModule PRIVATE
+  Qt6::Core
+  bass
+  bassopus
+)
