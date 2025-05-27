@@ -7,6 +7,7 @@ AudioChannel::AudioChannel(int channel_id, int device_id, QObject *parent)
     : QObject{parent}
     , channel{channel_id}
     , device{device_id}
+    , is_muted{false}
 {}
 
 AudioChannel::~AudioChannel()
@@ -17,15 +18,35 @@ AudioChannel::~AudioChannel()
   }
 }
 
+void CALLBACK endSyncProc(HSYNC handle, DWORD channel, DWORD data, void *user)
+{
+  qDebug() << "Loop Callback reached";
+
+  Q_UNUSED(handle)
+  Q_UNUSED(data)
+  QWORD loop_start = *(static_cast<unsigned *>(user));
+  BASS_ChannelLock(channel, true);
+  BASS_ChannelSetPosition(channel, loop_start, BASS_POS_BYTE);
+  BASS_ChannelLock(channel, false);
+}
+
+void CALLBACK deviceLost()
+{
+  qDebug() << "BASS AUDIO DEVICE LOST";
+}
+
 void AudioChannel::setFile(QString f_file)
 {
+  DWORD flags = BASS_STREAM_AUTOFREE | BASS_SAMPLE_LOOP; // Automatic Cleanup, always looping
+
   if (f_file.startsWith("http"))
   {
-    stream = BASS_StreamCreateURL(f_file.toUtf8(), 0, 0, nullptr, nullptr);
+    stream = BASS_StreamCreateURL(f_file.toUtf8(), 0, flags, nullptr, nullptr);
   }
   else
   {
-    stream = BASS_StreamCreateFile(false, f_file.toUtf8(), 0, 0, BASS_SAMPLE_FLOAT | BASS_SAMPLE_LOOP);
+    flags |= BASS_STREAM_PRESCAN | BASS_ASYNCFILE; // accurate seek points and length reading, file is in UTF-16 form, asynchronous reading/decoding
+    stream = BASS_StreamCreateFile(false, f_file.toUtf8(), 0, 0, flags);
   }
 
   if (!stream)
@@ -35,15 +56,26 @@ void AudioChannel::setFile(QString f_file)
   setChannelDevice(device);
 }
 
-void AudioChannel::setLoopPoints(quint32 start, quint32 end)
+void AudioChannel::setLoopPoints(double start, double end)
 {
-  loop_start = start;
-  loop_end = end;
+  loop_start = BASS_ChannelSeconds2Bytes(stream, start);
+  loop_end = BASS_ChannelSeconds2Bytes(stream, end);
+
+  qDebug() << "Length:" << BASS_ChannelGetLength(stream, BASS_POS_BYTE) << "loop_start" << loop_start << "loop_end" << loop_end;
+
+  if (loop_start < loop_end)
+  {
+    BASS_ChannelSetSync(stream, BASS_SYNC_POS | BASS_SYNC_MIXTIME, loop_end, endSyncProc, &loop_start);
+  }
+  else
+  {
+    BASS_ChannelSetSync(stream, BASS_SYNC_POS | BASS_SYNC_MIXTIME, 0, endSyncProc, &loop_start);
+  }
 }
 
 void AudioChannel::setChannelVolume(int volume)
 {
-  float f_volume = (std::clamp(volume, 0, 100) / 100.0f);
+  float f_volume = (std::clamp(volume, 0, 100) / 100.0f) * is_muted;
   BASS_ChannelSetAttribute(stream, BASS_ATTRIB_VOL, f_volume);
 }
 
@@ -69,4 +101,10 @@ void AudioChannel::stop()
   {
     qDebug() << "Failed to pause stream:" << AudioError::getErrorMessage();
   }
+}
+
+void AudioChannel::setMuted(bool muted)
+{
+  is_muted = muted;
+  setChannelVolume(volume);
 }

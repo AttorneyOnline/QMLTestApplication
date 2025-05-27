@@ -3,10 +3,8 @@
 #include "audioerror.h"
 #include "bass.h"
 
-#include <iostream>
-
 #include <QDebug>
-#include <QTimer>
+#include <QVariant>
 
 #define BASS_NO_FLAGS 0
 
@@ -35,28 +33,16 @@ AudioBackend::AudioBackend(QObject *parent)
   }
 
   channels.insert(0, new AudioChannel(0, 1, this));
-  channels[0]->setFile("https://attorneyoffline.de/vanillabase/sounds/music/ace%20attorney/objection/%5baj%5d%20objection.opus");
+  channels[0]->setFile("Cross-Examination - Allegro 2001 - AA.opus");
+  channels[0]->setLoopPoints(QVariant("21.269").toDouble(), QVariant("78.582").toDouble());
   channels[0]->setChannelVolume(25);
   channels[0]->start();
-
-  QTimer *timer = new QTimer();
-  timer->setSingleShot(true);
-  timer->setInterval(5000);
-  timer->callOnTimeout([this]() {
-    std::cout << "Slot called" << std::endl;
-    channels[0]->stop();
-  });
-  timer->start();
-
-  QTimer *timer2 = new QTimer();
-  timer2->setSingleShot(true);
-  timer2->setInterval(10000);
-  timer2->callOnTimeout([this]() {
-    std::cout << "Slot 2 called" << std::endl;
-    channels[0]->start();
-  });
-  timer2->start();
 }
 
 AudioBackend::~AudioBackend()
 {}
+
+void AudioBackend::setChannelVolume(int channel, int volume)
+{
+  channels[channel]->setChannelVolume(volume);
+}

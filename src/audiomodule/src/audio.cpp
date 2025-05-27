@@ -13,3 +13,11 @@ void Audio::setBackend(AudioBackend *f_backend)
   }
   backend = f_backend;
 }
+
+void Audio::setChannelVolume(int channel, int volume)
+{
+  if (backend)
+  {
+    backend->setChannelVolume(channel, volume);
+  }
+}

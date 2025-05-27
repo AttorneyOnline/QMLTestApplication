@@ -15,6 +15,8 @@ public:
 
   void setBackend(AudioBackend *f_backend);
 
+  Q_INVOKABLE void setChannelVolume(int channel, int volume);
+
 private:
   QPointer<AudioBackend> backend;
 };

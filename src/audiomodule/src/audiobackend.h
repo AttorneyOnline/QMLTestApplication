@@ -13,13 +13,7 @@ public:
   explicit AudioBackend(QObject *parent);
   ~AudioBackend();
 
-  enum Channel
-  {
-    MUSIC,
-    AMBIENCE,
-    AUXILIARY,
-    AUXILIARY2
-  };
+  void setChannelVolume(int channel, int volume);
 
 private:
   HSTREAM handle;
