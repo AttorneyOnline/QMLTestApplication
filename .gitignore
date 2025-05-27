@@ -52,3 +52,12 @@ compile_commands.json
 *creator.user*
 
 *_qmlcache.qrc
+
+build/*
+bin/*.exe
+bin/*.ini
+bin/*.dll
+bin/music/*.opus
+bin/music/*.txt
+bass*
+modules/kddockwidgets

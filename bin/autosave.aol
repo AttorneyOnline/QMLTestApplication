@@ -1,0 +1,146 @@
+{
+    "allDockWidgets": [
+        {
+            "lastCloseReason": 0,
+            "lastPosition": {
+                "lastFloatingGeometry": {
+                    "height": 0,
+                    "width": 0,
+                    "x": 0,
+                    "y": 0
+                },
+                "lastOverlayedGeometries": [],
+                "placeholders": [
+                    {
+                        "isFloatingWindow": false,
+                        "itemIndex": 0,
+                        "mainWindowUniqueName": "MainLayout-1"
+                    }
+                ],
+                "tabIndex": -1,
+                "wasFloating": false
+            },
+            "uniqueName": "message1750384038709"
+        }
+    ],
+    "closedDockWidgets": null,
+    "floatingWindows": [],
+    "mainWindows": [
+        {
+            "affinities": null,
+            "geometry": {
+                "height": 600,
+                "width": 600,
+                "x": 980,
+                "y": 396
+            },
+            "isVisible": true,
+            "multiSplitterLayout": {
+                "frames": {
+                    "9": {
+                        "currentTabIndex": 0,
+                        "dockWidgets": [
+                            "message1750384038709"
+                        ],
+                        "geometry": {
+                            "height": 562,
+                            "width": 600,
+                            "x": 0,
+                            "y": 0
+                        },
+                        "id": "9",
+                        "isNull": false,
+                        "mainWindowUniqueName": "MainLayout-1",
+                        "objectName": "message1750384038709",
+                        "options": 0
+                    }
+                },
+                "layout": {
+                    "children": [
+                        {
+                            "guestId": "9",
+                            "isContainer": false,
+                            "isVisible": true,
+                            "sizingInfo": {
+                                "geometry": {
+                                    "height": 562,
+                                    "width": 600,
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "maxSizeHint": {
+                                    "height": 16777215,
+                                    "width": 16777215
+                                },
+                                "minSize": {
+                                    "height": 123,
+                                    "width": 80
+                                },
+                                "percentageWithinParent": 1.0
+                            }
+                        }
+                    ],
+                    "isContainer": true,
+                    "isVisible": false,
+                    "orientation": 2,
+                    "sizingInfo": {
+                        "geometry": {
+                            "height": 562,
+                            "width": 600,
+                            "x": 0,
+                            "y": 0
+                        },
+                        "maxSizeHint": {
+                            "height": 16777215,
+                            "width": 16777215
+                        },
+                        "minSize": {
+                            "height": 90,
+                            "width": 80
+                        },
+                        "percentageWithinParent": 0.0
+                    }
+                }
+            },
+            "normalGeometry": {
+                "height": 0,
+                "width": 0,
+                "x": 0,
+                "y": 0
+            },
+            "options": 0,
+            "screenIndex": 0,
+            "screenSize": {
+                "height": 1440,
+                "width": 2560
+            },
+            "uniqueName": "MainLayout-1",
+            "windowState": 0
+        }
+    ],
+    "screenInfo": [
+        {
+            "devicePixelRatio": 1.0,
+            "geometry": {
+                "height": 1440,
+                "width": 2560,
+                "x": 0,
+                "y": 0
+            },
+            "index": 0,
+            "name": "XV320QU M3"
+        },
+        {
+            "devicePixelRatio": 1.0,
+            "geometry": {
+                "height": 1080,
+                "width": 1920,
+                "x": 2560,
+                "y": 0
+            },
+            "index": 1,
+            "name": "2460G4"
+        }
+    ],
+    "serializationVersion": 3
+}
