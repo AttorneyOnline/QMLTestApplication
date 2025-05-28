@@ -32,10 +32,10 @@ AudioBackend::AudioBackend(QObject *parent)
     }
   }
 
-  channels.insert(0, new AudioChannel(0, 1, this));
+  channels.insert(0, new AudioChannel(0, 2, this));
   channels[0]->setFile("Cross-Examination - Allegro 2001 - AA.opus");
   channels[0]->setLoopPoints(QVariant("21.269").toDouble(), QVariant("78.582").toDouble());
-  channels[0]->setChannelVolume(25);
+  channels[0]->setChannelVolume(100);
   channels[0]->start();
 }
 

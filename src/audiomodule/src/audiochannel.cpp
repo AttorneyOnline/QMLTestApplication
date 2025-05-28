@@ -7,7 +7,7 @@ AudioChannel::AudioChannel(int channel_id, int device_id, QObject *parent)
     : QObject{parent}
     , channel{channel_id}
     , device{device_id}
-    , is_muted{false}
+    , audio_enabled{true}
 {}
 
 AudioChannel::~AudioChannel()
@@ -45,7 +45,7 @@ void AudioChannel::setFile(QString f_file)
   }
   else
   {
-    flags |= BASS_STREAM_PRESCAN | BASS_ASYNCFILE; // accurate seek points and length reading, file is in UTF-16 form, asynchronous reading/decoding
+    flags |= BASS_STREAM_PRESCAN | BASS_ASYNCFILE; // accurate seek points and length reading, asynchronous reading/decoding
     stream = BASS_StreamCreateFile(false, f_file.toUtf8(), 0, 0, flags);
   }
 
@@ -75,7 +75,7 @@ void AudioChannel::setLoopPoints(double start, double end)
 
 void AudioChannel::setChannelVolume(int volume)
 {
-  float f_volume = (std::clamp(volume, 0, 100) / 100.0f) * is_muted;
+  float f_volume = (std::clamp(volume, 0, 100) / 100.0f) * audio_enabled;
   BASS_ChannelSetAttribute(stream, BASS_ATTRIB_VOL, f_volume);
 }
 
@@ -103,8 +103,8 @@ void AudioChannel::stop()
   }
 }
 
-void AudioChannel::setMuted(bool muted)
+void AudioChannel::setAudioEnabled(bool enabled)
 {
-  is_muted = muted;
+  audio_enabled = enabled;
   setChannelVolume(volume);
 }

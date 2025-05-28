@@ -16,7 +16,7 @@ public:
   void setChannelDevice(DWORD device_id);
   void start();
   void stop();
-  void setMuted(bool muted);
+  void setAudioEnabled(bool enabled);
 
 private:
   HSTREAM stream;
@@ -25,5 +25,5 @@ private:
   int volume;
   int channel;
   int device;
-  bool is_muted;
+  bool audio_enabled;
 };
