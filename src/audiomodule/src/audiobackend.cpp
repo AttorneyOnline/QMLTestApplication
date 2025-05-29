@@ -12,8 +12,8 @@ AudioBackend::AudioBackend(QObject *parent)
     : QObject{parent}
 
 {
-  BASS_SetConfig(BASS_CONFIG_DEV_DEFAULT, 1);
   BASS_Free();
+  BASS_SetConfig(BASS_CONFIG_DEV_DEFAULT, 1);
   BASS_PluginLoad("bassopus", BASS_NO_FLAGS);
   qDebug() << "Status of BASSOPUS plugin:" << AudioError::getErrorMessage();
 
@@ -31,18 +31,55 @@ AudioBackend::AudioBackend(QObject *parent)
       qDebug() << "Failed to initialise device" << info.name;
     }
   }
-
-  channels.insert(0, new AudioChannel(0, 2, this));
-  channels[0]->setFile("Cross-Examination - Allegro 2001 - AA.opus");
-  channels[0]->setLoopPoints(QVariant("21.269").toDouble(), QVariant("78.582").toDouble());
-  channels[0]->setChannelVolume(100);
-  channels[0]->start();
 }
 
 AudioBackend::~AudioBackend()
 {}
 
-void AudioBackend::setChannelVolume(int channel, int volume)
+void AudioBackend::setChannelSong(int id, QString song)
 {
-  channels[channel]->setChannelVolume(volume);
+  AudioChannel *old_channel = channels.value(id);
+  if (old_channel)
+  {
+    old_channel->deleteLater();
+  }
+
+  AudioChannel *channel = new AudioChannel(id, 2, this);
+  channels.insert(id, channel);
+  channel->setFile(song);
+  channel->setChannelVolume(25);
+  channel->start();
+}
+
+void AudioBackend::setChannelVolume(int id, int volume)
+{
+  AudioChannel *channel = channels.value(id);
+  if (!channel)
+  {
+    qDebug() << "Tried to set volume on non-existant channel";
+    return;
+  }
+  channel->setChannelVolume(volume);
+}
+
+void AudioBackend::pauseChannel(int id)
+{
+  AudioChannel *channel = channels.value(id);
+  if (!channel)
+  {
+    qDebug() << "Tried to pause a non-existant channel";
+    return;
+  }
+  channel->pause();
+}
+
+void AudioBackend::resumeChannel(int id)
+{
+  AudioChannel *channel = channels.value(id);
+  if (!channel)
+  {
+    qDebug() << "Tried to resume a non-existant channel";
+    return;
+  }
+  channel->start();
 }

@@ -15,7 +15,7 @@ public:
   void setChannelVolume(int volume);
   void setChannelDevice(DWORD device_id);
   void start();
-  void stop();
+  void pause();
   void setAudioEnabled(bool enabled);
 
 private:

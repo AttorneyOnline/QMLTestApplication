@@ -13,7 +13,10 @@ public:
   explicit AudioBackend(QObject *parent);
   ~AudioBackend();
 
-  void setChannelVolume(int channel, int volume);
+  void setChannelSong(int id, QString song);
+  void setChannelVolume(int id, int volume);
+  void pauseChannel(int id);
+  void resumeChannel(int id);
 
 private:
   HSTREAM handle;

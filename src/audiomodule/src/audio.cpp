@@ -14,6 +14,30 @@ void Audio::setBackend(AudioBackend *f_backend)
   backend = f_backend;
 }
 
+void Audio::pauseChannel(int channel)
+{
+  if (backend)
+  {
+    backend->pauseChannel(channel);
+  }
+}
+
+void Audio::resumeChannel(int channel)
+{
+  if (backend)
+  {
+    backend->resumeChannel(channel);
+  }
+}
+
+void Audio::setChannelSong(int channel, QString song)
+{
+  if (backend)
+  {
+    backend->setChannelSong(channel, song);
+  }
+}
+
 void Audio::setChannelVolume(int channel, int volume)
 {
   if (backend)

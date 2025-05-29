@@ -15,6 +15,9 @@ public:
 
   void setBackend(AudioBackend *f_backend);
 
+  Q_INVOKABLE void pauseChannel(int channel);
+  Q_INVOKABLE void resumeChannel(int channel);
+  Q_INVOKABLE void setChannelSong(int channel, QString song);
   Q_INVOKABLE void setChannelVolume(int channel, int volume);
 
 private:

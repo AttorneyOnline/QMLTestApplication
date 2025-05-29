@@ -41,12 +41,12 @@ void AudioChannel::setFile(QString f_file)
 
   if (f_file.startsWith("http"))
   {
-    stream = BASS_StreamCreateURL(f_file.toUtf8(), 0, flags, nullptr, nullptr);
+    stream = BASS_StreamCreateURL(f_file.toUtf8(), 0, flags, nullptr, nullptr); // I wonder what's for dinner.
   }
   else
   {
-    flags |= BASS_STREAM_PRESCAN | BASS_ASYNCFILE; // accurate seek points and length reading, asynchronous reading/decoding
-    stream = BASS_StreamCreateFile(false, f_file.toUtf8(), 0, 0, flags);
+    flags |= BASS_STREAM_PRESCAN | BASS_UNICODE | BASS_ASYNCFILE; // accurate seek points and length reading, read filename as UTF-16, asynchronous reading/decoding
+    stream = BASS_StreamCreateFile(false, f_file.utf16(), 0, 0, flags);
   }
 
   if (!stream)
@@ -95,9 +95,9 @@ void AudioChannel::start()
   }
 }
 
-void AudioChannel::stop()
+void AudioChannel::pause()
 {
-  if (BASS_ChannelPause(stream))
+  if (!BASS_ChannelPause(stream))
   {
     qDebug() << "Failed to pause stream:" << AudioError::getErrorMessage();
   }
