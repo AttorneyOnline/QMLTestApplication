@@ -33,8 +33,3 @@ target_link_libraries(QMLTestApplication PRIVATE
 set_target_properties(QMLTestApplication PROPERTIES
         LIBRARY_OUTPUT_DIRECTORY $<1:${CMAKE_CURRENT_LIST_DIR}/bin>
         RUNTIME_OUTPUT_DIRECTORY $<1:${CMAKE_CURRENT_LIST_DIR}/bin>)
-
-#[[
-
-
-]]
