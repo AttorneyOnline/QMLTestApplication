@@ -4,7 +4,6 @@ import QtQuick.Window
 import QtQuick.Controls
 import QtQuick.Controls.Universal
 import Attorney.Audio
-import Attorney.Settings
 
 ApplicationWindow {
     visible: true

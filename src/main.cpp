@@ -2,10 +2,8 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 
-#include "audiomodule/src/audio.h"
-#include "audiomodule/src/audiobackend.h"
-#include "settingsmodule/src/settings.h"
-#include "settingsmodule/src/settingsbackend.h"
+#include "../modules/audio/src/audio.h"
+#include "../modules/audio/src/audiobackend.h"
 
 int main(int argc, char *argv[])
 {
@@ -20,9 +18,6 @@ int main(int argc, char *argv[])
 
   auto control = engine.singletonInstance<Audio *>("Attorney.Audio", "Audio");
   control->setBackend(new AudioBackend(&engine));
-
-  auto settings = engine.singletonInstance<Settings *>("Attorney.Settings", "Settings");
-  settings->setBackend(new SettingsBackend(&engine));
 
   engine.load(url);
   return app.exec();

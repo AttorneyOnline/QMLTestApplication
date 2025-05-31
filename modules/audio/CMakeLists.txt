@@ -9,12 +9,11 @@ VERSION 1.0
   src/audiobackend.h src/audiobackend.cpp
   src/audiochannel.h src/audiochannel.cpp
   src/audioerror.h
-
 )
 
 target_include_directories(AudioModule PUBLIC src libs)
 target_link_directories(AudioModule PUBLIC libs)
-target_link_libraries(AudioModule PRIVATE
+target_link_libraries(AudioModule PUBLIC
   Qt6::Core
   Qt6::Qml
   bass

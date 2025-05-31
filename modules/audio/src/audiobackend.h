@@ -3,7 +3,7 @@
 #include <QObject>
 #include <QPointer>
 
-#include "../libs/bass.h"
+#include "../libs/bass.h" // WHY?????? This makes me unreasonably unhappy.
 
 class AudioChannel;
 

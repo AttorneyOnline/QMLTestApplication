@@ -16,8 +16,7 @@ set(QT_QML_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/qml)
 set(QML_IMPORT_PATH ${QT_QML_OUTPUT_DIRECTORY} CACHE PATH "Extra QML import paths to make Qt Creator happy")
 qt_policy(SET QTP0001 NEW)
 
-add_subdirectory(src/audiomodule)
-add_subdirectory(src/settingsmodule)
+add_subdirectory(modules)
 
 qt_standard_project_setup(REQUIRES 6.8)
 qt_add_executable(QMLTestApplication
