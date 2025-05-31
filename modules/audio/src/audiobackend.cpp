@@ -131,6 +131,7 @@ void AudioBackend::setChannelVolume(int channel_id, int volume)
     return;
   }
 
+  m_settings->setChannelVolume(channel_id, volume);
   channel->setVolume(volume);
 }
 
@@ -156,6 +157,11 @@ void AudioBackend::resumeChannel(int channel_id)
   }
 
   channel->start();
+}
+
+int AudioBackend::volume(int channel_id)
+{
+  return m_settings->channelVolume(channel_id);
 }
 
 AudioChannel *AudioBackend::getChannel(int channel_id) const

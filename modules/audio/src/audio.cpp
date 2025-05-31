@@ -32,6 +32,15 @@ QList<QString> Audio::songs()
   return QStringList();
 }
 
+int Audio::volume(int channel)
+{
+  if (backend)
+  {
+    return backend->volume(channel);
+  }
+  return 0;
+}
+
 void Audio::setDevicePerChannel(int channel, QString device)
 {}
 

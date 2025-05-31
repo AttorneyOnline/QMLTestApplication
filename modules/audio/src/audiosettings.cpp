@@ -40,4 +40,7 @@ int AudioSettings::channelVolume(int id)
 }
 
 void AudioSettings::setChannelVolume(int id, int volume)
-{}
+{
+  const QString key = "volume/" + QString::number(id);
+  settings->setValue(key, volume);
+}

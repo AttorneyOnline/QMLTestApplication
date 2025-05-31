@@ -17,6 +17,7 @@ public:
 
   Q_INVOKABLE QList<QString> devices();
   Q_INVOKABLE QList<QString> songs();
+  Q_INVOKABLE int volume(int channel);
   Q_INVOKABLE void setDevicePerChannel(int channel, QString device);
   Q_INVOKABLE void pauseChannel(int channel);
   Q_INVOKABLE void resumeChannel(int channel);

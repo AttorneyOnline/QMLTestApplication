@@ -24,6 +24,8 @@ public:
   void pauseChannel(int channel_id);
   void resumeChannel(int channel_id);
 
+  int volume(int channel_id);
+
 private:
   void initializeAudioDevices();
 
