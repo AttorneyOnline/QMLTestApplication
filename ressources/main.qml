@@ -8,12 +8,14 @@ import Attorney.Audio
 ApplicationWindow {
     id: window
     visible: true
-    width: 900
-    height: 700
+    width: 1100
+    height: 800
     title: "Audio Player"
 
     Material.theme: Material.Dark
     Material.accent: Material.Cyan
+
+    property int selectedChannel: 0
 
     // Gradient background
     Rectangle {
@@ -32,7 +34,7 @@ ApplicationWindow {
 
         // Header
         Text {
-            text: "🎵 Audio Player"
+            text: "🎵 Multi-Channel Audio Player"
             font.pixelSize: 28
             font.bold: true
             color: "#ffffff"
@@ -51,10 +53,10 @@ ApplicationWindow {
             }
         }
 
-        // Audio Controls Section
+        // Audio Controls Section with Channel Selection
         Rectangle {
             Layout.fillWidth: true
-            Layout.preferredHeight: 120
+            Layout.preferredHeight: 160
             color: "#1e1e1e"
             radius: 15
             border.color: "#333333"
@@ -70,149 +72,672 @@ ApplicationWindow {
                 opacity: 0.3
             }
 
-            ColumnLayout {
+            RowLayout {
                 anchors.fill: parent
                 anchors.margins: 20
-                spacing: 15
+                spacing: 20
 
-                // Playback Controls
-                RowLayout {
-                    Layout.alignment: Qt.AlignHCenter
-                    spacing: 15
+                // Channel Selection (Vertical) - Fixed width and clipping
+                Rectangle {
+                    Layout.preferredWidth: 110
+                    Layout.fillHeight: true
+                    color: "#2a2a2a"
+                    radius: 10
+                    border.color: "#444444"
+                    border.width: 1
 
-                    Button {
-                        id: pauseButton
-                        text: "⏸️ Pause"
-                        font.pixelSize: 14
-                        font.bold: true
-                        Material.background: "#ff5722"
-                        Material.foreground: "#ffffff"
-                        implicitHeight: 40
+                    ColumnLayout { // This ColumnLayout directly manages the items below
+                        anchors.fill: parent
+                        anchors.margins: 8
+                        spacing: 4
 
-                        onClicked: Audio.pauseChannel(0)
-
-                        background: Rectangle {
-                            color: parent.pressed ? "#d84315" : (parent.hovered ? "#e64a19" : "#ff5722")
-                            radius: 20
-
-                            Behavior on color {
-                                ColorAnimation { duration: 150 }
-                            }
+                        Text {
+                            text: "🎛️ Active"
+                            font.bold: true
+                            font.pixelSize: 11
+                            color: "#ffffff"
+                            Layout.alignment: Qt.AlignHCenter
+                            Layout.preferredHeight: 20 // Give header a fixed height
                         }
-                    }
 
-                    Button {
-                        id: resumeButton
-                        text: "▶️ Resume"
-                        font.pixelSize: 14
-                        font.bold: true
-                        Material.background: "#4caf50"
-                        Material.foreground: "#ffffff"
-                        implicitHeight: 40
+                        // The Repeater is now directly inside this ColumnLayout
+                        Repeater {
+                            model: 4
+                            delegate: Button {
+                                // Use Layout properties to let ColumnLayout manage size
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true // This will make buttons share available height
+                                // Removed the old `width` and `height` properties as Layout will handle them
 
-                        onClicked: Audio.resumeChannel(0)
+                                text: "Ch " + (index + 1)
+                                font.pixelSize: 10
+                                font.bold: true
+                                checkable: true
+                                checked: selectedChannel === index
 
-                        background: Rectangle {
-                            color: parent.pressed ? "#2e7d32" : (parent.hovered ? "#388e3c" : "#4caf50")
-                            radius: 20
+                                onClicked: selectedChannel = index
 
-                            Behavior on color {
-                                ColorAnimation { duration: 150 }
+                                background: Rectangle {
+                                    anchors.fill: parent
+                                    color: {
+                                        if (parent.checked) return "#00bcd4"
+                                        if (parent.pressed) return "#404040"
+                                        if (parent.hovered) return "#333333"
+                                        return "#1a1a1a"
+                                    }
+                                    radius: 8
+                                    border.color: parent.checked ? "#ffffff" : "transparent"
+                                    border.width: parent.checked ? 1 : 0
+
+                                    Behavior on color {
+                                        ColorAnimation { duration: 150 }
+                                    }
+                                }
+
+                                contentItem: Item { // Keep the Item wrapper for robust centering
+                                    anchors.fill: parent
+                                    Text {
+                                        anchors.centerIn: parent // Center the text within the Item
+                                        text: parent.parent.text // Reference the button's text property
+                                        color: parent.parent.checked ? "#ffffff" : "#cccccc"
+                                        font: parent.parent.font
+                                        horizontalAlignment: Text.AlignHCenter
+                                        verticalAlignment: Text.AlignVCenter
+                                    }
+                                }
                             }
                         }
                     }
                 }
 
-                // Volume Control
-                RowLayout {
+                // Main Audio Controls - Better proportions
+                ColumnLayout {
                     Layout.fillWidth: true
+                    Layout.fillHeight: true
                     spacing: 15
 
-                    Text {
-                        text: "🔊"
-                        font.pixelSize: 20
-                        color: "#ffffff"
+                    // Playback Controls
+                    RowLayout {
+                        Layout.alignment: Qt.AlignHCenter
+                        spacing: 15
+
+                        Button {
+                            id: pauseButton
+                            text: "⏸️ Pause Ch" + (selectedChannel + 1)
+                            font.pixelSize: 13
+                            font.bold: true
+                            Material.background: "#ff5722"
+                            Material.foreground: "#ffffff"
+                            implicitHeight: 35
+                            implicitWidth: 150
+
+                            onClicked: Audio.pause(selectedChannel)
+
+                            background: Rectangle {
+                                color: parent.pressed ? "#d84315" : (parent.hovered ? "#e64a19" : "#ff5722")
+                                radius: 18
+
+                                Behavior on color {
+                                    ColorAnimation { duration: 150 }
+                                }
+                            }
+                        }
+
+                        Button {
+                            id: resumeButton
+                            text: "▶️ Resume Ch" + (selectedChannel + 1)
+                            font.pixelSize: 13
+                            font.bold: true
+                            Material.background: "#4caf50"
+                            Material.foreground: "#ffffff"
+                            implicitHeight: 35
+                            implicitWidth: 150
+
+                            onClicked: Audio.resume(selectedChannel)
+
+                            background: Rectangle {
+                                color: parent.pressed ? "#2e7d32" : (parent.hovered ? "#388e3c" : "#4caf50")
+                                radius: 18
+
+                                Behavior on color {
+                                    ColorAnimation { duration: 150 }
+                                }
+                            }
+                        }
                     }
 
-                    Text {
-                        text: "Volume"
-                        font.pixelSize: 14
-                        font.bold: true
-                        color: "#ffffff"
-                        Layout.preferredWidth: 60
-                    }
-
-                    Slider {
-                        id: channel0Volume
+                    // Volume Controls for all 4 channels - More compact layout
+                    ScrollView {
                         Layout.fillWidth: true
-                        Layout.maximumWidth: 300
-                        from: 0
-                        to: 100
-                        value: Audio.volume(0)
+                        Layout.fillHeight: true
+                        contentWidth: availableWidth
+                        clip: true
 
-                        Material.accent: "#00bcd4"
+                        ScrollBar.horizontal.policy: ScrollBar.AsNeeded
+                        ScrollBar.vertical.policy: ScrollBar.AlwaysOff
 
-                        property bool initialized: false
+                        GridLayout {
+                            id: volumeGrid
+                            width: parent.parent.width
+                            columns: 4
+                            rowSpacing: 8
+                            columnSpacing: 10
 
-                        Component.onCompleted: {
-                            initialized = true
-                        }
+                            Repeater {
+                                model: 4
+                                delegate: ColumnLayout {
+                                    Layout.fillWidth: true
+                                    spacing: 6
 
-                        onValueChanged: {
-                            if (initialized) {
-                                Audio.setChannelVolume(0, channel0Volume.value)
+                                    Text {
+                                        text: "🔊 Ch" + (index + 1)
+                                        font.pixelSize: 12
+                                        font.bold: true
+                                        color: selectedChannel === index ? "#00bcd4" : "#ffffff"
+                                        Layout.alignment: Qt.AlignHCenter
+
+                                        Behavior on color {
+                                            ColorAnimation { duration: 200 }
+                                        }
+                                    }
+
+                                    RowLayout {
+                                        Layout.fillWidth: true
+                                        spacing: 8
+
+                                        Text {
+                                            text: "Vol"
+                                            font.pixelSize: 10
+                                            color: "#ffffff"
+                                        }
+
+                                        Slider {
+                                            id: channelVolumeSlider
+                                            Layout.fillWidth: true
+                                            Layout.minimumWidth: 80
+                                            from: 0
+                                            to: 100
+                                            value: Audio.volume(index)
+
+                                            Material.accent: selectedChannel === index ? "#00bcd4" : "#666666"
+
+                                            property bool initialized: false
+                                            property int channelIndex: index
+
+                                            Component.onCompleted: {
+                                                initialized = true
+                                            }
+
+                                            onValueChanged: {
+                                                if (initialized) {
+                                                    Audio.setVolume(channelIndex, value)
+                                                }
+                                            }
+
+                                            background: Rectangle {
+                                                x: channelVolumeSlider.leftPadding
+                                                y: channelVolumeSlider.topPadding + channelVolumeSlider.availableHeight / 2 - height / 2
+                                                implicitWidth: 80
+                                                implicitHeight: 4
+                                                width: channelVolumeSlider.availableWidth
+                                                height: implicitHeight
+                                                radius: 2
+                                                color: "#404040"
+
+                                                Rectangle {
+                                                    width: channelVolumeSlider.visualPosition * parent.width
+                                                    height: parent.height
+                                                    color: selectedChannel === index ? "#00bcd4" : "#666666"
+                                                    radius: 2
+
+                                                    Behavior on color {
+                                                        ColorAnimation { duration: 200 }
+                                                    }
+                                                }
+                                            }
+
+                                            handle: Rectangle {
+                                                x: channelVolumeSlider.leftPadding + channelVolumeSlider.visualPosition * (channelVolumeSlider.availableWidth - width)
+                                                y: channelVolumeSlider.topPadding + channelVolumeSlider.availableHeight / 2 - height / 2
+                                                implicitWidth: 14
+                                                implicitHeight: 14
+                                                radius: 7
+                                                color: channelVolumeSlider.pressed ? (selectedChannel === index ? "#0097a7" : "#555555") : (selectedChannel === index ? "#00bcd4" : "#666666")
+                                                border.color: "#ffffff"
+                                                border.width: 1
+
+                                                Behavior on color {
+                                                    ColorAnimation { duration: 150 }
+                                                }
+                                            }
+                                        }
+
+                                        Rectangle {
+                                            Layout.preferredWidth: 35
+                                            Layout.preferredHeight: 20
+                                            color: "#333333"
+                                            radius: 10
+                                            border.color: selectedChannel === index ? "#00bcd4" : "#555555"
+                                            border.width: 1
+
+                                            Behavior on border.color {
+                                                ColorAnimation { duration: 200 }
+                                            }
+
+                                            Text {
+                                                anchors.centerIn: parent
+                                                text: Math.round(channelVolumeSlider.value) + "%"
+                                                font.family: "monospace"
+                                                font.bold: true
+                                                color: selectedChannel === index ? "#00bcd4" : "#cccccc"
+                                                font.pixelSize: 8
+
+                                                Behavior on color {
+                                                    ColorAnimation { duration: 200 }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
+                    }
+                }
+            }
+        }
 
-                        background: Rectangle {
-                            x: channel0Volume.leftPadding
-                            y: channel0Volume.topPadding + channel0Volume.availableHeight / 2 - height / 2
-                            implicitWidth: 200
-                            implicitHeight: 6
-                            width: channel0Volume.availableWidth
-                            height: implicitHeight
-                            radius: 3
-                            color: "#404040"
+        // Audio Device Configuration Section
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 220
+            color: "#1e1e1e"
+            radius: 15
+            border.color: "#333333"
+            border.width: 1
 
-                            Rectangle {
-                                width: channel0Volume.visualPosition * parent.width
-                                height: parent.height
-                                color: "#00bcd4"
-                                radius: 3
-                            }
-                        }
+            // Subtle glow effect
+            Rectangle {
+                anchors.fill: parent
+                color: "transparent"
+                radius: parent.radius
+                border.color: "#00bcd4"
+                border.width: 1
+                opacity: 0.2
+            }
 
-                        handle: Rectangle {
-                            x: channel0Volume.leftPadding + channel0Volume.visualPosition * (channel0Volume.availableWidth - width)
-                            y: channel0Volume.topPadding + channel0Volume.availableHeight / 2 - height / 2
-                            implicitWidth: 20
-                            implicitHeight: 20
-                            radius: 10
-                            color: channel0Volume.pressed ? "#0097a7" : "#00bcd4"
-                            border.color: "#ffffff"
-                            border.width: 2
+            ColumnLayout {
+                anchors.fill: parent
+                anchors.margins: 15
+                spacing: 10
 
-                            Behavior on color {
-                                ColorAnimation { duration: 150 }
-                            }
-                        }
+                RowLayout {
+                    Layout.fillWidth: true
+
+                    Text {
+                        text: "🎧 Audio Device Configuration"
+                        font.bold: true
+                        font.pixelSize: 18
+                        color: "#ffffff"
                     }
 
                     Rectangle {
-                        Layout.preferredWidth: 50
-                        Layout.preferredHeight: 30
+                        Layout.fillWidth: true
+                        height: 2
                         color: "#333333"
-                        radius: 15
-                        border.color: "#555555"
-                        border.width: 1
+                        radius: 1
+                    }
 
-                        Text {
-                            anchors.centerIn: parent
-                            text: Math.round(channel0Volume.value) + "%"
-                            font.family: "monospace"
-                            font.bold: true
-                            color: "#00bcd4"
-                            font.pixelSize: 12
+                    Text {
+                        text: "Configure output devices per channel"
+                        font.pixelSize: 12
+                        color: "#888888"
+                        font.italic: true
+                    }
+                }
+
+                ScrollView {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    contentWidth: availableWidth
+                    clip: true
+
+                    ScrollBar.horizontal.policy: ScrollBar.AsNeeded
+                    ScrollBar.vertical.policy: ScrollBar.AlwaysOff
+
+                    GridLayout {
+                        id: deviceGrid
+                        width: parent.parent.width
+                        columns: 2
+                        rowSpacing: 10
+                        columnSpacing: 15
+
+                        Repeater {
+                            model: 4
+                            delegate: Rectangle {
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 70
+                                color: selectedChannel === index ? "#2a2a3e" : "#2a2a2a"
+                                radius: 10
+                                border.color: selectedChannel === index ? "#00bcd4" : "#444444"
+                                border.width: selectedChannel === index ? 2 : 1
+
+                                // Store the channel index as a property
+                                property int channelIndex: index
+
+                                Behavior on color {
+                                    ColorAnimation { duration: 200 }
+                                }
+
+                                Behavior on border.color {
+                                    ColorAnimation { duration: 200 }
+                                }
+
+                                ColumnLayout {
+                                    anchors.fill: parent
+                                    anchors.margins: 10
+                                    spacing: 8
+
+                                    RowLayout {
+                                        Layout.fillWidth: true
+
+                                        Rectangle {
+                                            Layout.preferredWidth: 25
+                                            Layout.preferredHeight: 25
+                                            radius: 12.5
+                                            color: selectedChannel === parent.parent.channelIndex ? "#00bcd4" : "#666666"
+
+                                            Behavior on color {
+                                                ColorAnimation { duration: 200 }
+                                            }
+
+                                            Text {
+                                                anchors.centerIn: parent
+                                                text: parent.parent.parent.channelIndex + 1
+                                                color: "#ffffff"
+                                                font.pixelSize: 12
+                                                font.bold: true
+                                            }
+                                        }
+
+                                        Text {
+                                            text: "Channel " + (parent.parent.parent.channelIndex + 1)
+                                            font.pixelSize: 14
+                                            font.bold: true
+                                            color: selectedChannel === parent.parent.parent.channelIndex ? "#00bcd4" : "#ffffff"
+
+                                            Behavior on color {
+                                                ColorAnimation { duration: 200 }
+                                            }
+                                        }
+
+                                        Rectangle {
+                                            Layout.fillWidth: true
+                                            height: 1
+                                            color: "#444444"
+                                        }
+
+                                        Button {
+                                            implicitWidth: 30
+                                            implicitHeight: 25
+                                            font.pixelSize: 12
+
+                                            onClicked: selectedChannel = parent.parent.parent.channelIndex
+
+                                            background: Rectangle {
+                                                color: selectedChannel === parent.parent.parent.parent.channelIndex ? "#00bcd4" : (parent.hovered ? "#555555" : "transparent")
+                                                radius: 5
+                                                border.color: selectedChannel === parent.parent.parent.parent.channelIndex ? "#ffffff" : "#666666"
+                                                border.width: 1
+
+                                                Behavior on color {
+                                                    ColorAnimation { duration: 150 }
+                                                }
+                                            }
+
+                                            contentItem: Text {
+                                                text: parent.text
+                                                color: selectedChannel === parent.parent.parent.parent.parent.channelIndex ? "#ffffff" : "#cccccc"
+                                                font: parent.font
+                                                horizontalAlignment: Text.AlignHCenter
+                                                verticalAlignment: Text.AlignVCenter
+                                            }
+                                        }
+                                    }
+
+                                    RowLayout {
+                                        Layout.fillWidth: true
+                                        spacing: 10
+
+                                        Text {
+                                            text: "🔌"
+                                            font.pixelSize: 14
+                                            color: "#888888"
+                                        }
+
+                                        ComboBox {
+                                            id: deviceComboBox
+                                            Layout.fillWidth: true
+                                            Layout.preferredHeight: 30
+
+                                            property int channelIndex: parent.parent.parent.channelIndex
+                                            property bool initialized: false
+
+                                            model: Audio.availableDevices()
+
+                                            // Function to update the current index based on the Audio backend
+                                            function updateCurrentDevice() {
+                                                if (!initialized) return
+
+                                                console.log("Updating device for channel", channelIndex)
+                                                var currentDevice = Audio.device(channelIndex)
+                                                console.log("Current device from Audio:", currentDevice)
+
+                                                if (!currentDevice || currentDevice === "") {
+                                                    console.log("No device set for channel", channelIndex)
+                                                    return
+                                                }
+
+                                                // Find the index of the current device in the model
+                                                var deviceIndex = -1
+                                                for (var i = 0; i < model.length; i++) {
+                                                    if (model[i] === currentDevice) {
+                                                        deviceIndex = i
+                                                        break
+                                                    }
+                                                }
+
+                                                console.log("Found device at index:", deviceIndex, "for device:", currentDevice)
+                                                if (deviceIndex !== -1 && deviceIndex !== currentIndex) {
+                                                    console.log("Setting currentIndex to:", deviceIndex)
+                                                    currentIndex = deviceIndex
+                                                }
+                                            }
+
+                                            Component.onCompleted: {
+                                                console.log("ComboBox for channel", channelIndex, "completed")
+                                                initialized = true
+                                                updateCurrentDevice()
+                                            }
+
+                                            // Watch for changes in the selected channel to refresh device info
+                                            Connections {
+                                                target: window
+                                                function onSelectedChannelChanged() {
+                                                    if (channelIndex === selectedChannel) {
+                                                        deviceComboBox.updateCurrentDevice()
+                                                    }
+                                                }
+                                            }
+
+                                            // Use onCurrentIndexChanged instead of onActivated for more reliable behavior
+                                            onCurrentIndexChanged: {
+                                                if (initialized && currentIndex >= 0 && currentIndex < model.length) {
+                                                    var selectedDevice = model[currentIndex]
+                                                    console.log("Setting device for channel", channelIndex, "to:", selectedDevice)
+                                                    Audio.setDevice(channelIndex, selectedDevice)
+                                                }
+                                            }
+
+                                            // Also keep onActivated as backup
+                                            onActivated: function(index) {
+                                                if (initialized && index >= 0 && index < model.length) {
+                                                    var selectedDevice = model[index]
+                                                    console.log("Activated: Setting device for channel", channelIndex, "to:", selectedDevice)
+                                                    Audio.setDevice(channelIndex, selectedDevice)
+                                                }
+                                            }
+
+                                            background: Rectangle {
+                                                color: selectedChannel === parent.parent.parent.parent.channelIndex ? "#333344" : "#333333"
+                                                radius: 8
+                                                border.color: {
+                                                    if (parent.activeFocus) return selectedChannel === parent.parent.parent.parent.channelIndex ? "#00bcd4" : "#666666"
+                                                    if (parent.hovered) return selectedChannel === parent.parent.parent.parent.channelIndex ? "#0097a7" : "#555555"
+                                                    return selectedChannel === parent.parent.parent.parent.channelIndex ? "#00bcd4" : "#444444"
+                                                }
+                                                border.width: 1
+
+                                                Behavior on color {
+                                                    ColorAnimation { duration: 150 }
+                                                }
+
+                                                Behavior on border.color {
+                                                    ColorAnimation { duration: 150 }
+                                                }
+                                            }
+
+                                            contentItem: Text {
+                                                text: parent.displayText
+                                                font.pixelSize: 11
+                                                color: selectedChannel === parent.parent.parent.parent.parent.channelIndex ? "#ffffff" : "#cccccc"
+                                                verticalAlignment: Text.AlignVCenter
+                                                elide: Text.ElideRight
+                                                leftPadding: 10
+                                                rightPadding: 30
+
+                                                Behavior on color {
+                                                    ColorAnimation { duration: 200 }
+                                                }
+                                            }
+
+                                            indicator: Text {
+                                                x: parent.width - width - 8
+                                                y: parent.height / 2 - height / 2
+                                                text: "▼"
+                                                font.pixelSize: 10
+                                                color: selectedChannel === parent.parent.parent.parent.parent.channelIndex ? "#00bcd4" : "#888888"
+
+                                                Behavior on color {
+                                                    ColorAnimation { duration: 200 }
+                                                }
+                                            }
+
+                                            delegate: ItemDelegate {
+                                                id: comboDelegate
+                                                width: deviceComboBox.width
+                                                height: 35
+
+                                                // Store the ComboBox channel index in the delegate
+                                                property int delegateChannelIndex: deviceComboBox.channelIndex
+
+                                                // Make sure the delegate is properly configured
+                                                highlighted: deviceComboBox.highlightedIndex === index
+
+                                                contentItem: Text {
+                                                    text: modelData
+                                                    font.pixelSize: 11
+                                                    color: parent.highlighted ? "#ffffff" : (parent.hovered ? "#ffffff" : "#cccccc")
+                                                    verticalAlignment: Text.AlignVCenter
+                                                    elide: Text.ElideRight
+                                                    leftPadding: 10
+
+                                                    Behavior on color {
+                                                        ColorAnimation { duration: 150 }
+                                                    }
+                                                }
+
+                                                background: Rectangle {
+                                                    color: parent.highlighted ? "#444444" : (parent.hovered ? "#333333" : "#2a2a2a")
+                                                    radius: 4
+
+                                                    Behavior on color {
+                                                        ColorAnimation { duration: 150 }
+                                                    }
+                                                }
+
+                                                // Ensure the delegate can be clicked
+                                                MouseArea {
+                                                    anchors.fill: parent
+                                                    onClicked: {
+                                                        console.log("Delegate clicked for index:", index, "value:", modelData, "channel:", comboDelegate.delegateChannelIndex)
+                                                        deviceComboBox.currentIndex = index
+                                                        deviceComboBox.popup.close()
+                                                    }
+                                                }
+                                            }
+
+                                            popup: Popup {
+                                                y: parent.height + 2
+                                                width: parent.width
+                                                height: Math.min(contentItem.implicitHeight + 20, 200)
+                                                padding: 10
+
+                                                background: Rectangle {
+                                                    color: "#2a2a2a"
+                                                    radius: 8
+                                                    border.color: "#444444"
+                                                    border.width: 1
+                                                }
+
+                                                contentItem: ListView {
+                                                    clip: true
+                                                    implicitHeight: contentHeight
+                                                    model: deviceComboBox.model
+                                                    currentIndex: deviceComboBox.highlightedIndex
+
+                                                    delegate: deviceComboBox.delegate
+
+                                                    // Add explicit scrollbar
+                                                    ScrollIndicator.vertical: ScrollIndicator { }
+                                                }
+                                            }
+                                        }
+
+                                        Text {
+                                            Layout.preferredWidth: 80
+                                            text: {
+                                                var currentDevice = Audio.device(parent.parent.parent.channelIndex)
+                                                return currentDevice.length > 12 ? currentDevice.substring(0, 12) + "..." : currentDevice
+                                            }
+                                            font.pixelSize: 9
+                                            font.family: "monospace"
+                                            color: selectedChannel === parent.parent.parent.channelIndex ? "#00bcd4" : "#888888"
+                                            horizontalAlignment: Text.AlignRight
+                                            elide: Text.ElideRight
+
+                                            Behavior on color {
+                                                ColorAnimation { duration: 200 }
+                                            }
+
+                                            ToolTip.visible: ma.containsMouse
+                                            ToolTip.text: Audio.device(parent.parent.parent.channelIndex)
+                                            ToolTip.delay: 500
+
+                                            MouseArea {
+                                                id: ma
+                                                anchors.fill: parent
+                                                hoverEnabled: true
+                                            }
+                                        }
+                                    }
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: selectedChannel = parent.channelIndex
+                                    z: -1 // Behind other interactive elements
+                                }
+                            }
                         }
                     }
                 }
@@ -249,6 +774,13 @@ ApplicationWindow {
                         color: "#333333"
                         radius: 1
                     }
+
+                    Text {
+                        text: "Playing on: Channel " + (selectedChannel + 1)
+                        font.pixelSize: 12
+                        color: "#00bcd4"
+                        font.bold: true
+                    }
                 }
 
                 // Search Bar
@@ -282,6 +814,7 @@ ApplicationWindow {
                             color: "#ffffff"
                             placeholderTextColor: "#888888"
                             font.pixelSize: 14
+                            verticalAlignment: Text.AlignVCenter
 
                             background: Rectangle {
                                 color: "transparent"
@@ -329,7 +862,7 @@ ApplicationWindow {
                     ListView {
                         id: songsList
                         model: {
-                            var allSongs = Audio.songs()
+                            var allSongs = Audio.availableSongs()
                             if (searchField.text.length === 0) {
                                 return allSongs
                             }
@@ -367,7 +900,7 @@ ApplicationWindow {
                             // Set width to accommodate text, but at least the viewport width
                             width: Math.max(songsList.parent.width, implicitWidth)
 
-                            onDoubleClicked: Audio.setChannelSong(0, "music/" + modelData)
+                            onDoubleClicked: Audio.setSong(selectedChannel, "music/" + modelData)
 
                             contentItem: RowLayout {
                                 spacing: 15
@@ -407,6 +940,14 @@ ApplicationWindow {
                                     color: "#ffffff"
                                     font.pixelSize: 14
                                     elide: Text.ElideRight
+                                }
+
+                                Text {
+                                    text: "→ Ch" + (selectedChannel + 1)
+                                    color: "#00bcd4"
+                                    font.pixelSize: 10
+                                    font.bold: true
+                                    visible: parent.parent.hovered
                                 }
 
                                 Text {

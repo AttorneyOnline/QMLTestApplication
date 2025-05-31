@@ -37,7 +37,6 @@ AudioBackend::AudioBackend(QObject *parent)
 
 AudioBackend::~AudioBackend()
 {
-  // Clean up channels
   for (AudioChannel *channel : std::as_const(m_channels))
   {
     if (channel)
@@ -50,7 +49,6 @@ AudioBackend::~AudioBackend()
   BASS_Free();
 }
 
-// Audio file management
 QStringList AudioBackend::availableSongs() const
 {
   QDir music_dir(*musicDirectory());
@@ -69,6 +67,11 @@ QStringList AudioBackend::availableSongs() const
 QStringList AudioBackend::availableDevices() const
 {
   return m_audio_devices.keys();
+}
+
+QString AudioBackend::device(int channel_id) const
+{
+  return m_settings->channelAudioDevice(channel_id);
 }
 
 void AudioBackend::initializeAudioDevices()
@@ -110,11 +113,11 @@ void AudioBackend::setChannelSong(int channel_id, const QString &song_path)
 
   // Device names are more consistent than device Ids. Thanks Windows.
   QString device_name = m_settings->channelAudioDevice(channel_id);
-  int device_id = m_audio_devices.value(device_name, 0);
+  int device_id = m_audio_devices.value(device_name);
 
   AudioChannel *new_channel = new AudioChannel(channel_id, device_id, this);
   new_channel->setFile(song_path);
-  new_channel->setVolume(m_settings->channelVolume(device_id));
+  new_channel->setVolume(m_settings->channelVolume(channel_id));
 
   replaceChannel(channel_id, new_channel);
   new_channel->start();
@@ -124,15 +127,28 @@ void AudioBackend::setChannelSong(int channel_id, const QString &song_path)
 
 void AudioBackend::setChannelVolume(int channel_id, int volume)
 {
+  m_settings->setChannelVolume(channel_id, volume);
+
   AudioChannel *channel = getChannel(channel_id);
   if (!channel)
   {
     qDebug() << "Cannot set volume: channel" << channel_id << "does not exist";
     return;
   }
-
-  m_settings->setChannelVolume(channel_id, volume);
   channel->setVolume(volume);
+}
+
+void AudioBackend::setChannelDevice(int channel_id, const QString &device_name)
+{
+  m_settings->setChannelAudioDevice(channel_id, device_name);
+  AudioChannel *channel = getChannel(channel_id);
+  if (!channel)
+  {
+    qDebug() << "Cannot change device: channel" << channel_id << "does not exist";
+    return;
+  }
+  const int device_id = m_audio_devices.value(device_name);
+  channel->setDevice(device_id);
 }
 
 void AudioBackend::pauseChannel(int channel_id)
@@ -159,7 +175,19 @@ void AudioBackend::resumeChannel(int channel_id)
   channel->start();
 }
 
-int AudioBackend::volume(int channel_id)
+void AudioBackend::stopChannel(int channel_id)
+{
+  AudioChannel *channel = getChannel(channel_id);
+  if (!channel)
+  {
+    qDebug() << "Cannot stop: channel" << channel_id << "does not exist";
+    return;
+  }
+
+  channel->stop();
+}
+
+int AudioBackend::volume(int channel_id) const
 {
   return m_settings->channelVolume(channel_id);
 }

@@ -15,15 +15,20 @@ public:
 
   void setBackend(AudioBackend *f_backend);
 
-  Q_INVOKABLE QList<QString> devices();
-  Q_INVOKABLE QList<QString> songs();
-  Q_INVOKABLE int volume(int channel);
-  Q_INVOKABLE void setDevicePerChannel(int channel, QString device);
-  Q_INVOKABLE void pauseChannel(int channel);
-  Q_INVOKABLE void resumeChannel(int channel);
-  Q_INVOKABLE void setChannelSong(int channel, QString song);
-  Q_INVOKABLE void setChannelVolume(int channel, int volume);
+  // TODO : Turn this into proper bindings down the line. Good enough for testing.
+  Q_INVOKABLE QStringList availableSongs() const;
+  Q_INVOKABLE QStringList availableDevices() const;
+
+  Q_INVOKABLE int volume(int channel_id);
+  Q_INVOKABLE QString device(int channel_id);
+
+  Q_INVOKABLE void stop(int channel_id);
+  Q_INVOKABLE void pause(int channel_id);
+  Q_INVOKABLE void resume(int channel_id);
+  Q_INVOKABLE void setDevice(int channel_id, const QString &device);
+  Q_INVOKABLE void setSong(int channel_id, const QString &song);
+  Q_INVOKABLE void setVolume(int channel_id, int volume);
 
 private:
-  QPointer<AudioBackend> backend;
+  QPointer<AudioBackend> m_backend;
 };

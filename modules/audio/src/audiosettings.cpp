@@ -2,7 +2,10 @@
 
 #include <QSettings>
 
-#define DEFAULT_VOLUME 100
+namespace
+{
+  constexpr int DEFAULT_VOLUME = 100;
+} // namespace
 
 AudioSettings::AudioSettings(QObject *parent)
     : QObject{parent}

@@ -103,6 +103,20 @@ void AudioChannel::pause()
   }
 }
 
+void AudioChannel::stop()
+{
+  if (!stream)
+  {
+    qDebug() << "No stream available to pause";
+    return;
+  }
+
+  if (!BASS_ChannelStop(stream))
+  {
+    qDebug() << "Failed to stop stream:" << AudioError::getErrorMessage();
+  }
+}
+
 void AudioChannel::fadeOut(int duration)
 {
   if (!stream)

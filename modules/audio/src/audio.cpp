@@ -7,71 +7,93 @@ Audio::Audio(QObject *parent)
 
 void Audio::setBackend(AudioBackend *f_backend)
 {
-  if (backend)
+  if (m_backend)
   {
-    backend->deleteLater();
+    m_backend->deleteLater();
   }
-  backend = f_backend;
+  m_backend = f_backend;
 }
 
-QList<QString> Audio::devices()
+QList<QString> Audio::availableDevices() const
 {
-  if (backend)
+  if (m_backend)
   {
-    return backend->availableDevices();
+    return m_backend->availableDevices();
   }
   return QStringList();
 }
 
-QList<QString> Audio::songs()
+QList<QString> Audio::availableSongs() const
 {
-  if (backend)
+  if (m_backend)
   {
-    return backend->availableSongs();
+    return m_backend->availableSongs();
   }
   return QStringList();
 }
 
 int Audio::volume(int channel)
 {
-  if (backend)
+  if (m_backend)
   {
-    return backend->volume(channel);
+    return m_backend->volume(channel);
   }
   return 0;
 }
 
-void Audio::setDevicePerChannel(int channel, QString device)
-{}
-
-void Audio::pauseChannel(int channel)
+QString Audio::device(int channel_id)
 {
-  if (backend)
+  if (m_backend)
   {
-    backend->pauseChannel(channel);
+    return m_backend->device(channel_id);
+  }
+  return QString{};
+}
+
+void Audio::stop(int channel_id)
+{
+  if (m_backend)
+  {
+    m_backend->pauseChannel(channel_id);
   }
 }
 
-void Audio::resumeChannel(int channel)
+void Audio::setDevice(int channel_id, const QString &device)
 {
-  if (backend)
+  if (m_backend)
   {
-    backend->resumeChannel(channel);
+    m_backend->setChannelDevice(channel_id, device);
   }
 }
 
-void Audio::setChannelSong(int channel, QString song)
+void Audio::pause(int channel)
 {
-  if (backend)
+  if (m_backend)
   {
-    backend->setChannelSong(channel, song);
+    m_backend->pauseChannel(channel);
   }
 }
 
-void Audio::setChannelVolume(int channel, int volume)
+void Audio::resume(int channel)
 {
-  if (backend)
+  if (m_backend)
   {
-    backend->setChannelVolume(channel, volume);
+    m_backend->resumeChannel(channel);
+  }
+}
+
+void Audio::setSong(int channel, const QString &song)
+{
+  if (m_backend)
+  {
+    m_backend->setChannelSong(channel, song);
+  }
+}
+
+void Audio::setVolume(int channel, int volume)
+{
+  if (m_backend)
+  {
+    m_backend->setChannelVolume(channel, volume);
   }
 }

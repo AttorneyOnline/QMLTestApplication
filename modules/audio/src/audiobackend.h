@@ -18,13 +18,15 @@ public:
 
   QStringList availableSongs() const;
   QStringList availableDevices() const;
+  QString device(int channel_id) const;
+  int volume(int channel_id) const;
 
   void setChannelSong(int channel_id, const QString &song_path);
+  void setChannelDevice(int channel_id, const QString &device_name);
   void setChannelVolume(int channel_id, int volume);
   void pauseChannel(int channel_id);
   void resumeChannel(int channel_id);
-
-  int volume(int channel_id);
+  void stopChannel(int channel_id);
 
 private:
   void initializeAudioDevices();

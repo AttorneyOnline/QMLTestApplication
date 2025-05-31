@@ -15,6 +15,7 @@ public:
   void setFile(const QString &file_path);
   void start();
   void pause();
+  void stop();
   void fadeIn(int duration);
   void fadeOut(int duration);
 
