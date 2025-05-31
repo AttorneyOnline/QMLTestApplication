@@ -2,16 +2,13 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Window
 import QtQuick.Controls
-import QtQuick.Controls.Universal
+import QtQuick.Controls.Fusion
 import Attorney.Audio
 
 ApplicationWindow {
     visible: true
     width: 800
     height: 600
-
-    Universal.theme: Universal.Light
-    Universal.accent: Universal.Violet
 
     ColumnLayout {
         anchors.fill: parent
@@ -47,11 +44,11 @@ ApplicationWindow {
             Layout.fillHeight: true
             clip: true
             id: songs
-            model: ["Cross-Examination - Allegro 2001 - AA.opus", "Athena Cykes - Courtroom Révolutionnaire 2016 - SOJ.opus", "Cross-Examination - Moderato 2001 - AA.opus", "https://hopedespairforce.com/base/sounds/music/%5baadd%5d%20athena%20cykes%20~%20courtroom%20revolutionnaire%20(lyrics).opus"]
+            model: Audio.songs();
             delegate: Button {
                 width: ListView.view.width
-                text: modelData
-                onClicked: Audio.setChannelSong(0, modelData)
+                text: modelData.split(".")[0]
+                onClicked: Audio.setChannelSong(0, "music/" + modelData)
                 contentItem: Label {
                     text: parent.text
                     verticalAlignment: Text.AlignLeft

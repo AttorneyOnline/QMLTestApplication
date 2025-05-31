@@ -9,6 +9,7 @@ VERSION 1.0
   src/audiobackend.h src/audiobackend.cpp
   src/audiochannel.h src/audiochannel.cpp
   src/audioerror.h
+  SOURCES src/audiosettings.h src/audiosettings.cpp
 )
 
 target_include_directories(AudioModule PUBLIC src libs)

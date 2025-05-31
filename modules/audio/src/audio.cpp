@@ -14,6 +14,27 @@ void Audio::setBackend(AudioBackend *f_backend)
   backend = f_backend;
 }
 
+QList<QString> Audio::devices()
+{
+  if (backend)
+  {
+    return backend->availableDevices();
+  }
+  return QStringList();
+}
+
+QList<QString> Audio::songs()
+{
+  if (backend)
+  {
+    return backend->availableSongs();
+  }
+  return QStringList();
+}
+
+void Audio::setDevicePerChannel(int channel, QString device)
+{}
+
 void Audio::pauseChannel(int channel)
 {
   if (backend)
