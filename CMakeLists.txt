@@ -21,7 +21,7 @@ add_subdirectory(modules)
 qt_standard_project_setup(REQUIRES 6.8)
 qt_add_executable(QMLTestApplication
   src/main.cpp
-  ressources/main.qml
+  bin/main.qml
 )
 
 target_link_libraries(QMLTestApplication PRIVATE
@@ -35,11 +35,7 @@ set_target_properties(QMLTestApplication PROPERTIES
 )
 
 if(WIN32)
-    set_target_properties(QMLTestApplication
-    PROPERTIES
-        LINK_FLAGS_DEBUG "/SUBSYSTEM:CONSOLE"
+    set_target_properties(QMLTestApplication PROPERTIES
         LINK_FLAGS_RELEASE "/SUBSYSTEM:CONSOLE /ENTRY:mainCRTStartup"
-        LINK_FLAGS_RELWITHDEBINFO "/SUBSYSTEM:windows /ENTRY:mainCRTStartup"
-        LINK_FLAGS_MINSIZEREL "/SUBSYSTEM:windows /ENTRY:mainCRTStartup"
-    )
+)
 endif(WIN32)

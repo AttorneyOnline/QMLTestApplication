@@ -1,0 +1,67 @@
+name: CI Build
+
+on: push
+
+jobs:
+  formatting-check:
+    name: formatting-check
+    runs-on: ubuntu-latest
+    steps:
+     - uses: actions/checkout@v4
+     - name: Run clang-format style check for C++
+       uses: jidicula/clang-format-action@v4.15.0
+       with:
+         clang-format-version: '19'
+         check-path: 'src'
+         fallback-style: LLVM
+
+  build-windows:
+    needs: formatting-check
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@master
+        with:
+          submodules: recursive
+      
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: 6.8.*
+          target: desktop
+          arch: win64_msvc2022_64
+          cache: true
+          cache-key-prefix: install-qt-action
+
+      - name: Configure MSVC (Windows)
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Install Windows BASS
+        shell: bash
+        run: |
+          curl http://www.un4seen.com/files/bass24.zip -o bass.zip
+          unzip -d bass -o bass.zip
+          cp ./bass/c/bass.h ./modules/audio/libs/
+          cp ./bass/c/x64/bass.lib ./modules/audio/libs/
+          cp ./bass/x64/bass.dll ./bin/
+
+          curl http://www.un4seen.com/files/bassopus24.zip -o bassopus.zip
+          unzip -d bass -o bassopus.zip
+          cp ./bass/c/bassopus.h ./modules/audio/libs/
+          cp ./bass/c/x64/bassopus.lib ./modules/audio/libs/
+          cp ./bass/x64/bassopus.dll ./bin/
+
+      - name: Build
+        run: |
+          cmake . -D CMAKE_BUILD_TYPE=Release
+          cmake --build . --config Release
+
+      - name: Deploy Windows
+        shell: bash
+        run: |
+          windeployqt --no-translations  -qmldir bin  bin/QMLTestApplication.exe
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@master
+        with:
+          name: QMLTestApplication-Windows
+          path: ${{github.workspace}}/bin
