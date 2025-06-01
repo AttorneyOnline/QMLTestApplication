@@ -55,4 +55,6 @@ compile_commands.json
 
 build/*
 bin/*.exe
+bin/*.ini
+bin/*.dll
 bass*
