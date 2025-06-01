@@ -25,7 +25,7 @@ public:
   void setDevice(DWORD device_id);
   void setEnabled(bool enabled);
 
-  QString song();
+  QString song() const;
 
 private:
   float calculateTargetVolume() const;

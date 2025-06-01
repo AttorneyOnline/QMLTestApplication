@@ -72,7 +72,7 @@ void Audio::stop(int channel_id)
 {
   if (m_backend)
   {
-    m_backend->pauseChannel(channel_id);
+    m_backend->stopChannel(channel_id);
   }
 }
 

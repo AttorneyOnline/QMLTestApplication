@@ -23,6 +23,7 @@ QString AudioSettings::defaultAudioDevice()
 void AudioSettings::setDefaultAudioDevice(const QString &device_name)
 {
   settings->setValue("devices/default", device_name);
+  settings->sync();
 }
 
 QString AudioSettings::channelAudioDevice(int id)
@@ -35,6 +36,7 @@ void AudioSettings::setChannelAudioDevice(int id, const QString &device_name)
 {
   const QString key = "devices/" + QString::number(id);
   settings->setValue(key, device_name);
+  settings->sync();
 }
 
 int AudioSettings::channelVolume(int id)
@@ -47,6 +49,7 @@ void AudioSettings::setChannelVolume(int id, int volume)
 {
   const QString key = "volume/" + QString::number(id);
   settings->setValue(key, volume);
+  settings->sync();
 }
 
 int AudioSettings::fadeInDuration(const QString &song)
@@ -100,6 +103,7 @@ bool AudioSettings::fadeOutEnabled() const
 void AudioSettings::setFadeOutEnabled(bool state)
 {
   settings->setValue("fades/fadeout", state);
+  settings->sync();
 }
 
 bool AudioSettings::fadeInEnabled() const
@@ -110,4 +114,5 @@ bool AudioSettings::fadeInEnabled() const
 void AudioSettings::setFadeInEnabled(bool state)
 {
   settings->setValue("fades/fadein", state);
+  settings->sync();
 }

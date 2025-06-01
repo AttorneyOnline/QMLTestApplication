@@ -33,22 +33,11 @@ AudioBackend::AudioBackend(QObject *parent)
   }
 
   initializeAudioDevices();
-
-  m_fadeIn = m_settings->fadeInEnabled();
-  m_fadeOut = m_settings->fadeOutEnabled();
 }
 
 AudioBackend::~AudioBackend()
 {
-  for (AudioChannel *channel : std::as_const(m_channels))
-  {
-    if (channel)
-    {
-      channel->deleteLater();
-    }
-  }
-  m_channels.clear();
-
+  qDeleteAll(m_channels);
   BASS_Free();
 }
 
@@ -115,8 +104,7 @@ void AudioBackend::setChannelSong(int channel_id, const QString &song_path)
   }
 
   // Device names are more consistent than device Ids. Thanks Windows.
-  QString device_name = m_settings->channelAudioDevice(channel_id);
-  int device_id = m_audio_devices.value(device_name);
+  int device_id = m_audio_devices.value(m_settings->channelAudioDevice(channel_id));
 
   AudioChannel *new_channel = new AudioChannel(channel_id, device_id, this);
   new_channel->setFile(song_path);
@@ -134,73 +122,73 @@ void AudioBackend::setChannelVolume(int channel_id, int volume)
 {
   m_settings->setChannelVolume(channel_id, volume);
 
-  AudioChannel *channel = getChannel(channel_id);
-  if (!channel)
+  if (AudioChannel *channel = getChannel(channel_id))
+  {
+    channel->setVolume(volume);
+  }
+  else
   {
     qDebug() << "Cannot set volume: channel" << channel_id << "does not exist";
-    return;
   }
-  channel->setVolume(volume);
 }
 
 void AudioBackend::setChannelDevice(int channel_id, const QString &device_name)
 {
   m_settings->setChannelAudioDevice(channel_id, device_name);
-  AudioChannel *channel = getChannel(channel_id);
-  if (!channel)
+
+  if (AudioChannel *channel = getChannel(channel_id))
+  {
+    channel->setDevice(m_audio_devices.value(device_name));
+  }
+  else
   {
     qDebug() << "Cannot change device: channel" << channel_id << "does not exist";
-    return;
   }
-  const int device_id = m_audio_devices.value(device_name);
-  channel->setDevice(device_id);
 }
 
 void AudioBackend::pauseChannel(int channel_id)
 {
-  AudioChannel *channel = getChannel(channel_id);
-  if (!channel)
+  if (AudioChannel *channel = getChannel(channel_id))
+  {
+    channel->pause();
+  }
+  else
   {
     qDebug() << "Cannot pause: channel" << channel_id << "does not exist";
-    return;
   }
-
-  channel->pause();
 }
 
 void AudioBackend::resumeChannel(int channel_id)
 {
-  AudioChannel *channel = getChannel(channel_id);
-  if (!channel)
+  if (AudioChannel *channel = getChannel(channel_id))
+  {
+    channel->start();
+  }
+  else
   {
     qDebug() << "Cannot resume: channel" << channel_id << "does not exist";
-    return;
   }
-
-  channel->start();
 }
 
 void AudioBackend::stopChannel(int channel_id)
 {
-  AudioChannel *channel = getChannel(channel_id);
-  if (!channel)
+  if (AudioChannel *channel = getChannel(channel_id))
+  {
+    channel->stop();
+  }
+  else
   {
     qDebug() << "Cannot stop: channel" << channel_id << "does not exist";
-    return;
   }
-
-  channel->stop();
 }
 
 void AudioBackend::setFadeOut(bool state)
 {
-  m_fadeOut = state;
   m_settings->setFadeOutEnabled(state);
 }
 
 void AudioBackend::setFadeIn(bool state)
 {
-  m_fadeIn = state;
   m_settings->setFadeInEnabled(state);
 }
 
@@ -211,28 +199,26 @@ int AudioBackend::volume(int channel_id) const
 
 bool AudioBackend::fadeOut() const
 {
-  return m_fadeOut;
+  return m_settings->fadeOutEnabled();
 }
 
 bool AudioBackend::fadeIn() const
 {
-  return m_fadeIn;
+  return m_settings->fadeInEnabled();
 }
 
 AudioChannel *AudioBackend::getChannel(int channel_id) const
 {
-  return m_channels.value(channel_id, nullptr);
+  return m_channels.value(channel_id);
 }
 
 void AudioBackend::replaceChannel(int channel_id, AudioChannel *new_channel)
 {
-  AudioChannel *old_channel = m_channels.value(channel_id);
-  if (old_channel)
+  if (AudioChannel *old_channel = m_channels.value(channel_id))
   {
-    if (m_fadeOut)
+    if (m_settings->fadeOutEnabled())
     {
-      const int fade_duration = m_settings->fadeOutDuration(old_channel->song());
-      old_channel->fadeOut(fade_duration);
+      old_channel->fadeOut(m_settings->fadeOutDuration(old_channel->song()));
     }
     else
     {

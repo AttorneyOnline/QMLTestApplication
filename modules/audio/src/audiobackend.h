@@ -39,11 +39,7 @@ private:
   AudioChannel *getChannel(int channel_id) const;
   void replaceChannel(int channel_id, AudioChannel *new_channel);
 
-private:
   QMap<QString, int> m_audio_devices;
   QMap<int, AudioChannel *> m_channels;
   QPointer<AudioSettings> m_settings;
-
-  bool m_fadeOut = true;
-  bool m_fadeIn = false;
 };

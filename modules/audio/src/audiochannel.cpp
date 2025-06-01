@@ -40,10 +40,11 @@ AudioChannel::AudioChannel(int channel_id, int device_id, QObject *parent)
 
 AudioChannel::~AudioChannel()
 {
-  if (stream && !BASS_ChannelStop(stream))
+  if (!BASS_ChannelStop(stream))
   {
     qDebug() << "Failed to stop BASS channel:" << AudioError::getErrorMessage();
   }
+  BASS_Free();
 }
 
 void AudioChannel::setFile(const QString &file_path)
@@ -110,7 +111,7 @@ void AudioChannel::stop()
 {
   if (!stream)
   {
-    qDebug() << "No stream available to pause";
+    qDebug() << "No stream available to stop";
     return;
   }
 
@@ -128,16 +129,10 @@ void AudioChannel::fadeOut(int duration)
     return;
   }
 
-  float current_volume;
-  if (!BASS_ChannelGetAttribute(stream, BASS_ATTRIB_VOL, &current_volume))
-  {
-    qDebug() << "Failed to get current volume for fade out:" << AudioError::getErrorMessage();
-    return;
-  }
-
   if (!BASS_ChannelSlideAttribute(stream, BASS_ATTRIB_VOL | BASS_SLIDE_LOG, -1, duration))
   {
     qDebug() << "Failed to start fade out:" << AudioError::getErrorMessage();
+    return;
   }
 
   QTimer *kill = new QTimer(this);
@@ -154,7 +149,7 @@ void AudioChannel::fadeIn(int duration)
     return;
   }
 
-  float target_volume = calculateTargetVolume();
+  const float target_volume = calculateTargetVolume();
 
   BASS_ChannelSetAttribute(stream, BASS_ATTRIB_VOL, 0.0f);
 
@@ -175,10 +170,10 @@ void AudioChannel::setLoopPoints(const QPair<double, double> &points)
   loop_start = BASS_ChannelSeconds2Bytes(stream, points.first);
   loop_end = BASS_ChannelSeconds2Bytes(stream, points.second);
 
-  QWORD stream_length = BASS_ChannelGetLength(stream, BASS_POS_BYTE);
+  const QWORD stream_length = BASS_ChannelGetLength(stream, BASS_POS_BYTE);
   qDebug() << "Stream length:" << stream_length << "Loop points:" << loop_start << "-" << loop_end;
 
-  QWORD sync_position = (loop_start < loop_end) ? loop_end : 0;
+  const QWORD sync_position = (loop_start < loop_end) ? loop_end : 0;
 
   if (!BASS_ChannelSetSync(stream, BASS_SYNC_POS | BASS_SYNC_MIXTIME, sync_position, endSyncProc, &loop_start))
   {
@@ -195,7 +190,7 @@ void AudioChannel::setVolume(int new_volume)
     return;
   }
 
-  float target_volume = calculateTargetVolume();
+  const float target_volume = calculateTargetVolume();
 
   if (!BASS_ChannelSetAttribute(stream, BASS_ATTRIB_VOL, target_volume))
   {
@@ -224,7 +219,7 @@ void AudioChannel::setEnabled(bool enabled)
   setVolume(volume);
 }
 
-QString AudioChannel::song()
+QString AudioChannel::song() const
 {
   return m_song;
 }
