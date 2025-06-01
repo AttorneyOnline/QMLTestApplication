@@ -50,6 +50,24 @@ QString Audio::device(int channel_id)
   return QString{};
 }
 
+bool Audio::fadeOut()
+{
+  if (m_backend)
+  {
+    return m_backend->fadeOut();
+  }
+  return false;
+}
+
+bool Audio::fadeIn()
+{
+  if (m_backend)
+  {
+    return m_backend->fadeIn();
+  }
+  return false;
+}
+
 void Audio::stop(int channel_id)
 {
   if (m_backend)
@@ -95,5 +113,21 @@ void Audio::setVolume(int channel, int volume)
   if (m_backend)
   {
     m_backend->setChannelVolume(channel, volume);
+  }
+}
+
+void Audio::setFadeOut(bool state)
+{
+  if (m_backend)
+  {
+    m_backend->setFadeOut(state);
+  }
+}
+
+void Audio::setFadeIn(bool state)
+{
+  if (m_backend)
+  {
+    m_backend->setFadeIn(state);
   }
 }

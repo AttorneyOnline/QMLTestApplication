@@ -17,6 +17,27 @@ ApplicationWindow {
 
     property int selectedChannel: 0
 
+    menuBar: MenuBar {
+           Menu {
+               title: qsTr("&Audio")
+
+               MenuItem {
+                   text: "Enable FadeIn"
+                   checkable: true
+                   checked: Audio.fadeIn()  // Initial state
+                   onTriggered: Audio.setFadeIn(checked)
+               }
+
+               MenuItem {
+                   text: "Enable FadeOut"
+                   checkable: true
+                   checked: Audio.fadeOut()  // Initial state
+                   onTriggered: Audio.setFadeOut(checked)
+               }
+           }
+    }
+
+
     // Gradient background
     Rectangle {
         anchors.fill: parent
@@ -31,27 +52,6 @@ ApplicationWindow {
         anchors.fill: parent
         anchors.margins: 20
         spacing: 20
-
-        // Header
-        Text {
-            text: "🎵 Multi-Channel Audio Player"
-            font.pixelSize: 28
-            font.bold: true
-            color: "#ffffff"
-            Layout.alignment: Qt.AlignHCenter
-
-            // Simple text shadow effect using layered text
-            Text {
-                anchors.fill: parent
-                text: parent.text
-                font: parent.font
-                color: "#000000"
-                opacity: 0.3
-                z: parent.z - 1
-                anchors.topMargin: 2
-                anchors.leftMargin: 2
-            }
-        }
 
         // Audio Controls Section with Channel Selection
         Rectangle {
@@ -91,15 +91,6 @@ ApplicationWindow {
                         anchors.margins: 8
                         spacing: 4
 
-                        Text {
-                            text: "🎛️ Active"
-                            font.bold: true
-                            font.pixelSize: 11
-                            color: "#ffffff"
-                            Layout.alignment: Qt.AlignHCenter
-                            Layout.preferredHeight: 20 // Give header a fixed height
-                        }
-
                         // The Repeater is now directly inside this ColumnLayout
                         Repeater {
                             model: 4
@@ -107,7 +98,6 @@ ApplicationWindow {
                                 // Use Layout properties to let ColumnLayout manage size
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true // This will make buttons share available height
-                                // Removed the old `width` and `height` properties as Layout will handle them
 
                                 text: "Ch " + (index + 1)
                                 font.pixelSize: 10
@@ -162,14 +152,36 @@ ApplicationWindow {
                         spacing: 15
 
                         Button {
+                            id: stopButton
+                            text: "Stop Channel " + (selectedChannel + 1)
+                            font.pixelSize: 12
+                            font.bold: true
+                            Material.background: "#f44336"
+                            Material.foreground: "#ffffff"
+                            implicitHeight: 35
+                            implicitWidth: 180
+
+                            onClicked: Audio.stop(selectedChannel)
+
+                            background: Rectangle {
+                                color: parent.pressed ? "#c62828" : (parent.hovered ? "#d32f2f" : "#f44336")
+                                radius: 18
+
+                                Behavior on color {
+                                    ColorAnimation { duration: 150 }
+                                }
+                            }
+                        }
+
+                        Button {
                             id: pauseButton
-                            text: "⏸️ Pause Ch" + (selectedChannel + 1)
+                            text: "Pause Channel " + (selectedChannel + 1)
                             font.pixelSize: 13
                             font.bold: true
                             Material.background: "#ff5722"
                             Material.foreground: "#ffffff"
                             implicitHeight: 35
-                            implicitWidth: 150
+                            implicitWidth: 180
 
                             onClicked: Audio.pause(selectedChannel)
 
@@ -185,13 +197,13 @@ ApplicationWindow {
 
                         Button {
                             id: resumeButton
-                            text: "▶️ Resume Ch" + (selectedChannel + 1)
+                            text: "Resume Channel " + (selectedChannel + 1)
                             font.pixelSize: 13
                             font.bold: true
                             Material.background: "#4caf50"
                             Material.foreground: "#ffffff"
                             implicitHeight: 35
-                            implicitWidth: 150
+                            implicitWidth: 180
 
                             onClicked: Audio.resume(selectedChannel)
 

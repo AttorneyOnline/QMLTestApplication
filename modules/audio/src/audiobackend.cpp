@@ -33,6 +33,9 @@ AudioBackend::AudioBackend(QObject *parent)
   }
 
   initializeAudioDevices();
+
+  m_fadeIn = m_settings->fadeInEnabled();
+  m_fadeOut = m_settings->fadeOutEnabled();
 }
 
 AudioBackend::~AudioBackend()
@@ -120,6 +123,8 @@ void AudioBackend::setChannelSong(int channel_id, const QString &song_path)
   new_channel->setVolume(m_settings->channelVolume(channel_id));
 
   replaceChannel(channel_id, new_channel);
+  new_channel->setLoopPoints(m_settings->loopPoints(song_path));
+  new_channel->fadeIn(m_settings->fadeInDuration(song_path));
   new_channel->start();
 
   qDebug() << "Set song" << song_path << "on channel" << channel_id;
@@ -187,9 +192,31 @@ void AudioBackend::stopChannel(int channel_id)
   channel->stop();
 }
 
+void AudioBackend::setFadeOut(bool state)
+{
+  m_fadeOut = state;
+  m_settings->setFadeOutEnabled(state);
+}
+
+void AudioBackend::setFadeIn(bool state)
+{
+  m_fadeIn = state;
+  m_settings->setFadeInEnabled(state);
+}
+
 int AudioBackend::volume(int channel_id) const
 {
   return m_settings->channelVolume(channel_id);
+}
+
+bool AudioBackend::fadeOut() const
+{
+  return m_fadeOut;
+}
+
+bool AudioBackend::fadeIn() const
+{
+  return m_fadeIn;
 }
 
 AudioChannel *AudioBackend::getChannel(int channel_id) const
@@ -202,7 +229,15 @@ void AudioBackend::replaceChannel(int channel_id, AudioChannel *new_channel)
   AudioChannel *old_channel = m_channels.value(channel_id);
   if (old_channel)
   {
-    old_channel->deleteLater();
+    if (m_fadeOut)
+    {
+      const int fade_duration = m_settings->fadeOutDuration(old_channel->song());
+      old_channel->fadeOut(fade_duration);
+    }
+    else
+    {
+      old_channel->deleteLater();
+    }
   }
   m_channels.insert(channel_id, new_channel);
 }

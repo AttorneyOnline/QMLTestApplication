@@ -2,6 +2,7 @@
 #include "audioerror.h"
 
 #include <QDebug>
+#include <QTimer>
 #include <algorithm>
 
 // BASS callback functions
@@ -52,6 +53,8 @@ void AudioChannel::setFile(const QString &file_path)
     qDebug() << "Empty file path provided";
     return;
   }
+
+  m_song = file_path;
 
   DWORD flags = BASS_STREAM_AUTOFREE | BASS_SAMPLE_LOOP;
 
@@ -132,10 +135,15 @@ void AudioChannel::fadeOut(int duration)
     return;
   }
 
-  if (!BASS_ChannelSlideAttribute(stream, BASS_ATTRIB_VOL, 0.0f, duration))
+  if (!BASS_ChannelSlideAttribute(stream, BASS_ATTRIB_VOL | BASS_SLIDE_LOG, -1, duration))
   {
     qDebug() << "Failed to start fade out:" << AudioError::getErrorMessage();
   }
+
+  QTimer *kill = new QTimer(this);
+  kill->setInterval(duration);
+  kill->start();
+  kill->callOnTimeout([this]() { deleteLater(); }); // Find a better way for this, good enough for now ...
 }
 
 void AudioChannel::fadeIn(int duration)
@@ -156,7 +164,7 @@ void AudioChannel::fadeIn(int duration)
   }
 }
 
-void AudioChannel::setLoopPoints(double start, double end)
+void AudioChannel::setLoopPoints(const QPair<double, double> &points)
 {
   if (!stream)
   {
@@ -164,8 +172,8 @@ void AudioChannel::setLoopPoints(double start, double end)
     return;
   }
 
-  loop_start = BASS_ChannelSeconds2Bytes(stream, start);
-  loop_end = BASS_ChannelSeconds2Bytes(stream, end);
+  loop_start = BASS_ChannelSeconds2Bytes(stream, points.first);
+  loop_end = BASS_ChannelSeconds2Bytes(stream, points.second);
 
   QWORD stream_length = BASS_ChannelGetLength(stream, BASS_POS_BYTE);
   qDebug() << "Stream length:" << stream_length << "Loop points:" << loop_start << "-" << loop_end;
@@ -214,6 +222,11 @@ void AudioChannel::setEnabled(bool enabled)
 {
   audio_enabled = enabled;
   setVolume(volume);
+}
+
+QString AudioChannel::song()
+{
+  return m_song;
 }
 
 float AudioChannel::calculateTargetVolume() const

@@ -21,6 +21,8 @@ public:
 
   Q_INVOKABLE int volume(int channel_id);
   Q_INVOKABLE QString device(int channel_id);
+  Q_INVOKABLE bool fadeOut();
+  Q_INVOKABLE bool fadeIn();
 
   Q_INVOKABLE void stop(int channel_id);
   Q_INVOKABLE void pause(int channel_id);
@@ -28,6 +30,8 @@ public:
   Q_INVOKABLE void setDevice(int channel_id, const QString &device);
   Q_INVOKABLE void setSong(int channel_id, const QString &song);
   Q_INVOKABLE void setVolume(int channel_id, int volume);
+  Q_INVOKABLE void setFadeOut(bool state);
+  Q_INVOKABLE void setFadeIn(bool state);
 
 private:
   QPointer<AudioBackend> m_backend;

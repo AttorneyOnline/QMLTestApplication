@@ -20,6 +20,16 @@ public:
   int channelVolume(int id);
   void setChannelVolume(int id, int volume);
 
+  int fadeInDuration(const QString &song);
+  int fadeOutDuration(const QString &song);
+  QPair<double, double> loopPoints(const QString &song) const;
+
+  bool fadeOutEnabled() const;
+  void setFadeOutEnabled(bool state);
+
+  bool fadeInEnabled() const;
+  void setFadeInEnabled(bool state);
+
 private:
   QSettings *settings;
 };

@@ -20,10 +20,12 @@ public:
   void fadeOut(int duration);
 
   // Audio configuration
-  void setLoopPoints(double start, double end);
+  void setLoopPoints(const QPair<double, double> &points);
   void setVolume(int volume);
   void setDevice(DWORD device_id);
   void setEnabled(bool enabled);
+
+  QString song();
 
 private:
   float calculateTargetVolume() const;
@@ -33,6 +35,7 @@ private:
   quint32 loop_end;
 
   // Properties
+  QString m_song;
   int volume;
   int channel;
   int device;

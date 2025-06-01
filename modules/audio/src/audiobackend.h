@@ -20,6 +20,8 @@ public:
   QStringList availableDevices() const;
   QString device(int channel_id) const;
   int volume(int channel_id) const;
+  bool fadeOut() const;
+  bool fadeIn() const;
 
   void setChannelSong(int channel_id, const QString &song_path);
   void setChannelDevice(int channel_id, const QString &device_name);
@@ -27,6 +29,8 @@ public:
   void pauseChannel(int channel_id);
   void resumeChannel(int channel_id);
   void stopChannel(int channel_id);
+  void setFadeOut(bool state);
+  void setFadeIn(bool state);
 
 private:
   void initializeAudioDevices();
@@ -39,4 +43,7 @@ private:
   QMap<QString, int> m_audio_devices;
   QMap<int, AudioChannel *> m_channels;
   QPointer<AudioSettings> m_settings;
+
+  bool m_fadeOut = true;
+  bool m_fadeIn = false;
 };
