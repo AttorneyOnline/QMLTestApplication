@@ -58,3 +58,4 @@ bin/*.exe
 bin/*.ini
 bin/*.dll
 bass*
+modules/kddockwidgets

@@ -9,8 +9,8 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 REQUIRED COMPONENTS Core Quick Qml)
-find_package(Qt6 REQUIRED COMPONENTS Core Quick Qml)
+find_package(QT NAMES Qt6 REQUIRED COMPONENTS Core Quick Qml Widgets QuickControls2)
+find_package(Qt6 REQUIRED COMPONENTS Core Quick Qml Widgets QuickControls2)
 
 set(QT_QML_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/qml)
 set(QML_IMPORT_PATH ${QT_QML_OUTPUT_DIRECTORY} CACHE PATH "Extra QML import paths to make Qt Creator happy")
@@ -21,12 +21,14 @@ add_subdirectory(modules)
 qt_standard_project_setup(REQUIRES 6.8)
 qt_add_executable(QMLTestApplication
   src/main.cpp
-  bin/main.qml
+  bin/files/main.qml
 )
 
 target_link_libraries(QMLTestApplication PRIVATE
   Qt6::Core
   Qt6::Quick
+  AudioModuleplugin
+  KDAB::kddockwidgets
 )
 
 set_target_properties(QMLTestApplication PROPERTIES
