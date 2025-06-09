@@ -4,6 +4,7 @@ set(KDDockWidgets_QT6 ON CACHE BOOL "Enable KDDockWidgets Qt6 Support")
 set(KDDockWidgets_FRONTENDS CACHE STRING "qtquick")
 set(KDDockWidgets_QTQUICK ON CACHE BOOL "Enable Qt Quick modules in KDDockWidgets" FORCE)
 set(KDDockWidgets_EXAMPLES OFF CACHE BOOL "Disable examples in KDDockWidgets" FORCE)
+set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/bin CACHE PATH "Install prefix" FORCE)
 
 include(FetchContent)
 FetchContent_Declare(
