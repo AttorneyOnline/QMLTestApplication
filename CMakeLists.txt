@@ -27,6 +27,7 @@ qt_add_executable(QMLTestApplication
 target_link_libraries(QMLTestApplication PRIVATE
   Qt6::Core
   Qt6::Quick
+  Qt6::Widgets
   AudioModuleplugin
   KDAB::kddockwidgets
 )
