@@ -16,5 +16,5 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(KDDockWidgets)
 
 set_target_properties(kddockwidgets PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/$<0:>
 )
