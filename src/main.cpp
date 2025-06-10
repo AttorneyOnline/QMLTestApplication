@@ -1,11 +1,11 @@
+#include <QApplication>
 #include <QDebug>
-#include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <kddockwidgets/qtquick/Platform.h>
 
 int main(int argc, char *argv[])
 {
-  QGuiApplication app(argc, argv);
+  QApplication app(argc, argv);
   QQmlApplicationEngine engine;
   KDDockWidgets::initFrontend(KDDockWidgets::FrontendType::QtQuick);
   KDDockWidgets::QtQuick::Platform::instance()->setQmlEngine(&engine);
