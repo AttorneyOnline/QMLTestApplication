@@ -18,7 +18,7 @@ Rectangle {
        z: 2  // Higher z value puts yellow on top
        height: 100
        width: 100
-       color: "red"
+       color: "yellow"
    }
 
    Rectangle {

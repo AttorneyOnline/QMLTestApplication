@@ -6,6 +6,8 @@ import com.kdab.dockwidgets 2.0 as KDDW
 import QtQuick.Layouts
 import Attorney.Audio
 
+// BE CAREFUL WHEN TOUCHING THIS FILE
+// THIS IS SYSTEM CODE THAT SHOULD NOT BE EDITED UNLESS YOU KNOW WHAT YOU ARE DOING
 ApplicationWindow {
     id: root
     visible: true
