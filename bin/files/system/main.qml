@@ -76,6 +76,13 @@ ApplicationWindow {
                     title: modelData.uniqueName
 
                     MenuItem {
+                        text: qsTr("Visible")
+                        checkable: true
+                        checked: modelData.visible
+                        onTriggered: toggleDockVisibility(modelData)
+                    }
+
+                    MenuItem {
                         text: qsTr("Reload")
                         onTriggered: {
                             reloadDock(modelData)
@@ -218,5 +225,15 @@ ApplicationWindow {
     function getDisplayNameFromPath(filePath) {
         var fileName = filePath.split('/').pop().split('\\').pop()
         return fileName.replace('.qml', '')
+    }
+
+    function toggleDockVisibility(dock) {
+        if (dock.visible) {
+            // Apparently there is a isOpen() function that does not seem to actually exist :shrug:
+            dock.close()
+            dock.visible = false
+        } else {
+            dock.show()
+        }
     }
 }
